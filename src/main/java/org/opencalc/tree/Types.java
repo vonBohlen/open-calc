@@ -8,5 +8,6 @@ public enum Types {
     MULTIPLY,
     DIVIDE,
     ROOT,
-    POTENCY
+    POTENCY,
+
 }

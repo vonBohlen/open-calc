@@ -13,17 +13,22 @@ public class Term {
     Node root;
 
     public Term(String problem){
-        this.problem = problem;
+        this.problem = prepareTerm(problem);
         //TODO: set hasVars if there are variables in the Term
         createTree();
         if(hasVars){ shortenTree(); }
     }
 
     public void setTerm(String problem){
-        this.problem = problem;
+        this.problem = prepareTerm(problem);
         //TODO: set hasVars if there are variables in the Term
         createTree();
         if(hasVars){ shortenTree(); }
+    }
+
+    //TODO: Prepare the given statement (eg. replace sqrt with √)
+    String prepareTerm(String problem){
+        return problem;
     }
 
     void createTree(){
@@ -35,6 +40,6 @@ public class Term {
     }
 
     public double solve(Dictionary<Character, Double> assignation){
-        return root.solve(assignation);
+        return  root.solve(assignation);
     }
 }
