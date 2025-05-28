@@ -8,7 +8,7 @@ import java.util.Dictionary;
 public class Term {
 
     String problem;
-    public boolean hasVars;
+    public boolean hasVars = false;
 
     Node root;
 
@@ -32,7 +32,7 @@ public class Term {
     }
 
     void createTree(){
-
+        root = new Node(problem);
     }
 
     void shortenTree(){

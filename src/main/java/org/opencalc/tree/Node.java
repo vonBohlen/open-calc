@@ -20,9 +20,11 @@ public class Node {
 
 
 
-        boolean splitter = true;
+        boolean splitter = false;
         //only repeats if the whole term is bracketed
         while(!splitter) {
+            indexLPO = 0;
+            hierarchy = 10;
             //determines the splitting point
             for (int i = 0; i < term.length(); i++) {
                 if (ignore) {
@@ -47,7 +49,7 @@ public class Node {
                         }
                     }
                     //3
-                    case '^', '√' -> {
+                    case '^', '?' -> {
                         if (hierarchy > 3) {
                             hierarchy = 3;
                             indexLPO = i;
