@@ -1,5 +1,6 @@
 package org.opencalc.tree;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 
 public class Node {
@@ -17,6 +18,7 @@ public class Node {
         int hierarchy = 10;
 
         boolean ignore = false;
+        int additionalBrackets = 0;
 
 
 
@@ -25,11 +27,24 @@ public class Node {
         while(!splitter) {
             indexLPO = 0;
             hierarchy = 10;
+
+            ignore = false;
+            additionalBrackets = 0;
+
             //determines the splitting point
             for (int i = 0; i < term.length(); i++) {
                 if (ignore) {
+                    if(term.charAt(i) == '('){
+                        additionalBrackets++;
+                        continue;
+                    }
                     if (term.charAt(i) == ')') {
-                        ignore = false;
+                        if(additionalBrackets == 0){
+                            ignore = false;
+                        }
+                        else{
+                            additionalBrackets--;
+                        }
                     }
                     continue;
                 }
@@ -82,6 +97,12 @@ public class Node {
             try{
                 num = Double.parseDouble(term);
             }catch (Exception e){
+                //account for e
+                if(term.charAt(0) == 'e'){
+                    type = Types.NUMBER;
+                    value = Math.E;
+                    return;
+                }
                 type = Types.VARIABLE;
                 symbol = term.charAt(0);
                 return;
@@ -136,7 +157,9 @@ public class Node {
             case VARIABLE -> { return false; }
             case NUMBER -> { return true; }
             case ADD -> {
-                if(left.shortenTree() && right.shortenTree()){
+                boolean leftS = left.shortenTree();
+                boolean rightS = right.shortenTree();
+                if(leftS && rightS){
                     value = left.value + right.value;
                     type = Types.NUMBER;
 
@@ -148,7 +171,9 @@ public class Node {
                 return false;
             }
             case SUBTRACT -> {
-                if(left.shortenTree() && right.shortenTree()){
+                boolean leftS = left.shortenTree();
+                boolean rightS = right.shortenTree();
+                if(leftS && rightS){
                     value = left.value - right.value;
                     type = Types.NUMBER;
 
@@ -160,7 +185,9 @@ public class Node {
                 return false;
             }
             case MULTIPLY -> {
-                if(left.shortenTree() && right.shortenTree()){
+                boolean leftS = left.shortenTree();
+                boolean rightS = right.shortenTree();
+                if(leftS && rightS){
                     value = left.value * right.value;
                     type = Types.NUMBER;
 
@@ -184,7 +211,9 @@ public class Node {
                 return false;
             }
             case POTENCY -> {
-                if(left.shortenTree() && right.shortenTree()){
+                boolean leftS = left.shortenTree();
+                boolean rightS = right.shortenTree();
+                if(leftS && rightS){
                     value = Math.pow(left.value, right.value);
                     type = Types.NUMBER;
 
@@ -196,7 +225,7 @@ public class Node {
                 return false;
             }
             case ROOT -> {
-                if(left.shortenTree() && right.shortenTree()){
+                if(left.shortenTree()){
                     value = Math.sqrt(left.value);
                     type = Types.NUMBER;
 
@@ -212,29 +241,29 @@ public class Node {
     }
 
     //solves the tree without alternating it just by calling this method on its adjacent Nodes which return their results
-    public double solve(Dictionary<Character, Double> assignations){
+    public double solve(ArrayList<Character> keys, ArrayList<Double> values){
         switch(type){
             case VARIABLE -> {
-                return assignations.get(symbol);
+                return values.get(keys.indexOf(symbol));
             }
             case NUMBER -> { return value; }
             case ADD -> {
-                return left.solve(assignations) + right.solve(assignations);
+                return left.solve(keys, values) + right.solve(keys, values);
             }
             case SUBTRACT -> {
-                return left.solve(assignations) - right.solve(assignations);
+                return left.solve(keys, values) - right.solve(keys, values);
             }
             case MULTIPLY -> {
-                return left.solve(assignations) * right.solve(assignations);
+                return left.solve(keys, values) * right.solve(keys, values);
             }
             case DIVIDE -> {
-                return left.solve(assignations) / right.solve(assignations);
+                return left.solve(keys, values) / right.solve(keys, values);
             }
             case POTENCY -> {
-                return Math.pow(left.solve(assignations), right.solve(assignations));
+                return Math.pow(left.solve(keys, values), right.solve(keys, values));
             }
             case ROOT -> {
-                return Math.sqrt(left.solve(assignations));
+                return Math.sqrt(left.solve(keys, values));
             }
             default -> { return 0.0; }
         }

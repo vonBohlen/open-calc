@@ -39,7 +39,7 @@ public class Term {
         root.shortenTree();
     }
 
-    public double solve(Dictionary<Character, Double> assignation){
-        return  root.solve(assignation);
+    public double solve(ArrayList<Character> keys, ArrayList<Double> values){
+        return  root.solve(keys, values);
     }
 }
