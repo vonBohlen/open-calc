@@ -6,6 +6,8 @@ import java.util.HashMap;
 
 public class Node {
 
+    public ArrayList<Character> operands = new ArrayList<>();
+
     public Types type;
 
     public Node left;
@@ -16,6 +18,12 @@ public class Node {
     public boolean negative;
 
     public Node(String term){
+        operands.add('+');
+        operands.add('-');
+        operands.add('*');
+        operands.add('/');
+        operands.add(')');
+
         int indexLPO = 0;
         int hierarchy = 10;
 
@@ -59,16 +67,9 @@ public class Node {
                         }
                     }
                     case '-' -> {
-                        //checking if it is not a negative number
-                        //first symbol
-                        if(i == 0){ continue; }
-                        //previous symbol is neither a number nor a closed bracket
-                        try{
-                            Double.parseDouble(term.charAt(i-1)+"");
-                        }catch (Exception e){
-                            if(term.charAt(i-1) != ')'){
-                                continue;
-                            }
+                        //if the symbol is at the first place or after an operand it is not an operand
+                        if(i == 0 || operands.contains(term.charAt(i-1))){
+                            continue;
                         }
 
                         if (hierarchy > 1) {
@@ -212,16 +213,9 @@ public class Node {
                 continue;
             }
             if(sub.charAt(i) == '-'){
-                //checking if it is not a negative number
-                //first symbol
-                if(i == 0){ continue; }
-                //previous symbol is neither a number nor a closed bracket
-                try{
-                    Double.parseDouble(sub.charAt(i-1)+"");
-                }catch (Exception e){
-                    if(sub.charAt(i-1) != ')'){
-                        continue;
-                    }
+                //if the symbol is at the first place or after an operand it is not an operand
+                if(i == 0 || operands.contains(sub.charAt(i-1))){
+                    continue;
                 }
 
                 //if the program runs till here the - is an operand
