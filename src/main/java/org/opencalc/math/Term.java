@@ -4,6 +4,7 @@ import org.opencalc.tree.Node;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 
 public class Term {
 
@@ -39,7 +40,7 @@ public class Term {
         root.shortenTree();
     }
 
-    public double solve(ArrayList<Character> keys, ArrayList<Double> values){
-        return  root.solve(keys, values);
+    public double solve(HashMap<Character, Double> assignation){
+        return  root.solve(assignation);
     }
 }

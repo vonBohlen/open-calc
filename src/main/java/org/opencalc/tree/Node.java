@@ -2,6 +2,7 @@ package org.opencalc.tree;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 
 public class Node {
 
@@ -12,6 +13,7 @@ public class Node {
 
     public double value;
     public char symbol;
+    public boolean negative;
 
     public Node(String term){
         int indexLPO = 0;
@@ -50,7 +52,25 @@ public class Node {
                 }
                 switch (term.charAt(i)) {
                     //1
-                    case '+', '-' -> {
+                    case '+' -> {
+                        if (hierarchy > 1) {
+                            hierarchy = 1;
+                            indexLPO = i;
+                        }
+                    }
+                    case '-' -> {
+                        //checking if it is not a negative number
+                        //first symbol
+                        if(i == 0){ continue; }
+                        //previous symbol is neither a number nor a closed bracket
+                        try{
+                            Double.parseDouble(term.charAt(i-1)+"");
+                        }catch (Exception e){
+                            if(term.charAt(i-1) != ')'){
+                                continue;
+                            }
+                        }
+
                         if (hierarchy > 1) {
                             hierarchy = 1;
                             indexLPO = i;
@@ -104,7 +124,13 @@ public class Node {
                     return;
                 }
                 type = Types.VARIABLE;
+                if(term.charAt(0) == '-'){
+                    symbol = term.charAt(1);
+                    negative = true;
+                    return;
+                }
                 symbol = term.charAt(0);
+                negative = false;
                 return;
             }
             type = Types.NUMBER;
@@ -115,12 +141,21 @@ public class Node {
         //if there was an operand the term gets split and the left and right child nodes get determined
         switch (hierarchy){
             case 1 -> {
-                //get type
-                type = term.charAt(indexLPO) == '+' ? Types.ADD : Types.SUBTRACT;
-                //set left tree
-                left = new Node(term.substring(0, indexLPO));
-                //set right tree
-                right = new Node(term.substring(indexLPO+1));
+                if(term.charAt(indexLPO) == '+'){
+                    type = Types.ADD;
+                    //set left tree
+                    left = new Node(term.substring(0, indexLPO));
+                    //set right tree
+                    right = new Node(term.substring(indexLPO+1));
+                }
+                //if the term is split all the add and sub operands have to get reversed because the calculation is handled as if there were brackets added
+                else{
+                    type = Types.SUBTRACT;
+                    //set left tree
+                    left = new Node(term.substring(0, indexLPO));
+                    //set right tree
+                    right = new Node(reverseTerm(term.substring(indexLPO+1)));
+                }
             }
             case 2 -> {
                 //get type
@@ -148,6 +183,52 @@ public class Node {
                 }
             }
         }
+    }
+
+    String reverseTerm(String sub){
+        boolean ignore = false;
+        int additionalBrackets = 0;
+        for(int i = 0; i < sub.length(); i++){
+            if (ignore) {
+                if(sub.charAt(i) == '('){
+                    additionalBrackets++;
+                    continue;
+                }
+                if (sub.charAt(i) == ')') {
+                    if(additionalBrackets == 0){
+                        ignore = false;
+                    }
+                    else{
+                        additionalBrackets--;
+                    }
+                }
+                continue;
+            }
+            if(sub.charAt(i) == '('){ ignore = true; }
+
+            //switch pluses
+            if(sub.charAt(i) == '+'){
+                sub = sub.substring(0, i) + '-' + sub.substring(i+1);
+                continue;
+            }
+            if(sub.charAt(i) == '-'){
+                //checking if it is not a negative number
+                //first symbol
+                if(i == 0){ continue; }
+                //previous symbol is neither a number nor a closed bracket
+                try{
+                    Double.parseDouble(sub.charAt(i-1)+"");
+                }catch (Exception e){
+                    if(sub.charAt(i-1) != ')'){
+                        continue;
+                    }
+                }
+
+                //if the program runs till here the - is an operand
+                sub = sub.substring(0, i) + '+' + sub.substring(i+1);
+            }
+        }
+        return sub;
     }
 
     //shortens the tree by alternating its value based on its adjacent Nodes by calling this method on them and looking at their returned boolean
@@ -241,29 +322,29 @@ public class Node {
     }
 
     //solves the tree without alternating it just by calling this method on its adjacent Nodes which return their results
-    public double solve(ArrayList<Character> keys, ArrayList<Double> values){
+    public double solve(HashMap<Character, Double> assignation){
         switch(type){
             case VARIABLE -> {
-                return values.get(keys.indexOf(symbol));
+                return negative ? -1*assignation.get(symbol) : assignation.get(symbol);
             }
             case NUMBER -> { return value; }
             case ADD -> {
-                return left.solve(keys, values) + right.solve(keys, values);
+                return left.solve(assignation) + right.solve(assignation);
             }
             case SUBTRACT -> {
-                return left.solve(keys, values) - right.solve(keys, values);
+                return left.solve(assignation) - right.solve(assignation);
             }
             case MULTIPLY -> {
-                return left.solve(keys, values) * right.solve(keys, values);
+                return left.solve(assignation) * right.solve(assignation);
             }
             case DIVIDE -> {
-                return left.solve(keys, values) / right.solve(keys, values);
+                return left.solve(assignation) / right.solve(assignation);
             }
             case POTENCY -> {
-                return Math.pow(left.solve(keys, values), right.solve(keys, values));
+                return Math.pow(left.solve(assignation), right.solve(assignation));
             }
             case ROOT -> {
-                return Math.sqrt(left.solve(keys, values));
+                return Math.sqrt(left.solve(assignation));
             }
             default -> { return 0.0; }
         }

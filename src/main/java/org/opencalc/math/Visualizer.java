@@ -111,7 +111,7 @@ public class Visualizer extends Frame
         //g.drawString(node.value + "; " + node.bf + "; " + node.height, getSize().width / (potence + 1) * index, getSize().height / (layers + 1) * layer);
         switch(node.type){
             case NUMBER -> {
-                g.drawString(node.value + "", getSize().width / (potence + 1) * index, getSize().height / (layers + 1) * layer);
+                g.drawString((node.value == Math.E ? "e" : node.value) + "", getSize().width / (potence + 1) * index, getSize().height / (layers + 1) * layer);
             }
             case VARIABLE -> {
                 g.drawString(node.symbol + "", getSize().width / (potence + 1) * index, getSize().height / (layers + 1) * layer);

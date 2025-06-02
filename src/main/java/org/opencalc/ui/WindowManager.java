@@ -25,8 +25,9 @@ public class WindowManager {
 //        root.add(button);
         new GuiWindow(root);
         //frame.add(DataHand.renderMan);
-        root.pack();
+        //root.pack();
         root.setLocationRelativeTo(null);
+        root.setLayout(null);
         root.setVisible(true);
     }
 

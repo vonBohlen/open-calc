@@ -14,13 +14,13 @@ public class GuiComponents {
         int keyHeight = dss.height / 100;
         int keyWidth = dss.width / 100;
         int currentX = 0;
-        int currentY = 0;
+        int currentY = dss.height;
         for (int i = 0; i <= 5; i++) {
             JButton button = new JButton(key1[0][i]);
             button.setBounds(currentX, currentY, keyWidth, keyHeight);
             components.put("key1", button);
             currentX += keyWidth;
-            currentY += keyHeight;
+            //currentY -= keyHeight;
         }
 
     }
