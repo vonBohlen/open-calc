@@ -23,7 +23,7 @@ public class Test {
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         //Visualizer visualizer = new Visualizer(screen.height, screen.width, term.root);
 
-        Graphtest test = new Graphtest(800, 800, term);
+        Graphtest test = new Graphtest(800, 800, true, term);
         test.run();
 
 

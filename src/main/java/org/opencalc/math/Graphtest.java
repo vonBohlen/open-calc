@@ -26,17 +26,22 @@ public class Graphtest extends Frame implements Runnable{
 
     Term term;
 
-    public Graphtest(int height, int width, Term term){
+    public Graphtest(int height, int width, boolean startMaxSize, Term term){
         super("Graphvisualisierer");
 
         //Frameconfiguration
+        if(startMaxSize) {
+            setExtendedState(MAXIMIZED_BOTH);
+        }
+        
         setSize(width, height);
+        setResizable(true);
+
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = screen.width / 2 - width / 2;
         int y = screen.height / 2 - height / 2;
         setLocation(x, y);
 
-        setResizable(true);
         setVisible(true);
 
         this.term = term;
@@ -73,7 +78,7 @@ public class Graphtest extends Frame implements Runnable{
 
         //draw x-Axis
         g.setColor(new Color(0,0,0));
-        if(0 >= xMin && 0 <= xMax){
+        if(0 >= yMin && 0 <= yMax){
             double y = dbi.height-(-yMin)/(yMax-yMin)*dbi.height;
             g.drawLine(0, (int)y, dbi.width, (int)y);
         }
