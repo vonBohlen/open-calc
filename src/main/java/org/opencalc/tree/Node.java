@@ -85,7 +85,7 @@ public class Node {
                         }
                     }
                     //3
-                    case '^', '?' -> {
+                    case '^', '?', '~' -> {
                         if (hierarchy > 3) {
                             hierarchy = 3;
                             indexLPO = i;
@@ -104,6 +104,12 @@ public class Node {
 
             //checks if the whole term is bracketed, erases them if so and repeats the process
             if(hierarchy == 4){
+                if(term.charAt(0) == '-'){
+                    term = term.substring(1,term.length());
+                    negative = !negative;
+                    splitter = false;
+                    continue;
+                }
                 term = term.substring(1,term.length()-1);
                 splitter = false;
             }
@@ -177,7 +183,7 @@ public class Node {
                 }
                 //in case of a square root
                 else{
-                    type = Types.ROOT;
+                    type = term.charAt(indexLPO) == '?' ? Types.ROOT : Types.SINE;
                     //set left tree
                     left = new Node(term.substring(indexLPO+1));
                     //only the left tree is set
@@ -235,7 +241,7 @@ public class Node {
                 boolean leftS = left.shortenTree();
                 boolean rightS = right.shortenTree();
                 if(leftS && rightS){
-                    value = left.value + right.value;
+                    value = (negative ? -1 : 1) * left.value + right.value;
                     type = Types.NUMBER;
 
                     left = null;
@@ -249,7 +255,7 @@ public class Node {
                 boolean leftS = left.shortenTree();
                 boolean rightS = right.shortenTree();
                 if(leftS && rightS){
-                    value = left.value - right.value;
+                    value = (negative ? -1 : 1) * left.value - right.value;
                     type = Types.NUMBER;
 
                     left = null;
@@ -263,7 +269,7 @@ public class Node {
                 boolean leftS = left.shortenTree();
                 boolean rightS = right.shortenTree();
                 if(leftS && rightS){
-                    value = left.value * right.value;
+                    value = (negative ? -1 : 1) * left.value * right.value;
                     type = Types.NUMBER;
 
                     left = null;
@@ -275,7 +281,7 @@ public class Node {
             }
             case DIVIDE -> {
                 if(left.shortenTree() && right.shortenTree()){
-                    value = left.value / right.value;
+                    value = (negative ? -1 : 1) * left.value / right.value;
                     type = Types.NUMBER;
 
                     left = null;
@@ -289,7 +295,7 @@ public class Node {
                 boolean leftS = left.shortenTree();
                 boolean rightS = right.shortenTree();
                 if(leftS && rightS){
-                    value = Math.pow(left.value, right.value);
+                    value = (negative ? -1 : 1) * Math.pow(left.value, right.value);
                     type = Types.NUMBER;
 
                     left = null;
@@ -311,6 +317,18 @@ public class Node {
                 }
                 return false;
             }
+            case SINE -> {
+                if(left.shortenTree()){
+                    value = Math.sin(left.value);
+                    type = Types.NUMBER;
+
+                    left = null;
+                    right = null;
+
+                    return true;
+                }
+                return false;
+            }
             default -> { return false; }
         }
     }
@@ -323,22 +341,25 @@ public class Node {
             }
             case NUMBER -> { return value; }
             case ADD -> {
-                return left.solve(assignation) + right.solve(assignation);
+                return (negative ? -1 : 1) * left.solve(assignation) + right.solve(assignation);
             }
             case SUBTRACT -> {
-                return left.solve(assignation) - right.solve(assignation);
+                return (negative ? -1 : 1) * left.solve(assignation) - right.solve(assignation);
             }
             case MULTIPLY -> {
-                return left.solve(assignation) * right.solve(assignation);
+                return (negative ? -1 : 1) * left.solve(assignation) * right.solve(assignation);
             }
             case DIVIDE -> {
-                return left.solve(assignation) / right.solve(assignation);
+                return (negative ? -1 : 1) * left.solve(assignation) / right.solve(assignation);
             }
             case POTENCY -> {
-                return Math.pow(left.solve(assignation), right.solve(assignation));
+                return (negative ? -1 : 1) * Math.pow(left.solve(assignation), right.solve(assignation));
             }
             case ROOT -> {
-                return Math.sqrt(left.solve(assignation));
+                return (negative ? -1 : 1) * Math.sqrt(left.solve(assignation));
+            }
+            case SINE -> {
+                return (negative ? -1 : 1) * Math.sin(left.solve(assignation));
             }
             default -> { return 0.0; }
         }

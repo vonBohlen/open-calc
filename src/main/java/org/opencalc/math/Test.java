@@ -12,10 +12,13 @@ public class Test {
 
         //TODO: Wenn zum Beispiel -2x verwendet wird muss daraus beim preparen -2*x gemacht werden
 
-        String problem = "5*(-9+2*x*?(e^x))";
+        //String problem = "5*(-9+2*x*?(e^x))";
         //String problem = "";
         //String problem = "0.001*x^5-0.01*x^4+9";
         //String problem = "1000*x-1000";
+        //String problem = "-5";
+        String problem = "?(x)";
+
 
         Term term = new Term(problem);
         term.shortenTree();

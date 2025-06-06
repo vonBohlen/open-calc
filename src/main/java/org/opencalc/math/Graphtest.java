@@ -100,17 +100,26 @@ public class Graphtest extends Frame implements Runnable{
             double x = xMin + (i+0.5)/dbi.width*(xMax-xMin);
             //solve for x
             xValue.put('x', x);
-            double result = term.solve(xValue);
-            //if result is on screen
-            if(result >= yMin && result <= yMax){
-                //y coordinate on screen
-                double y = (result - yMin)/(yMax-yMin)*dbi.height;
-                //add to list but alternate y because the origins don't align
-                points.add(new Dimension(i, dbi.height-(int)y));
-            }
-            else{
+            double result = 0.0;
+            try {
+                result = term.solve(xValue);
+            }catch (Exception e){
                 points.add(null);
+                continue;
             }
+
+            /*if(result < yMin){
+                //result is exactly one pixel outside the window
+                result = yMin - 1.0/dbi.height*(yMax-yMin);
+            }
+            else if(result > yMax){
+                //result is exactly one pixel outside the window
+                result = yMax + 1.0/dbi.height*(yMax-yMin);
+            }*/
+            //y coordinate on screen
+            double y = (result - yMin)/(yMax-yMin)*dbi.height;
+            //add to list but alternate y because the origins don't align
+            points.add(new Dimension(i, dbi.height-(int)y));
         }
 
         //draw points as lines because only points would have margins when the gradient is too high
@@ -148,7 +157,6 @@ public class Graphtest extends Frame implements Runnable{
             lastTime = currentTime;
 
             if(delta >= 1){
-                System.out.println("HI");
                 if(action()){
                     drawGraph();
                 }

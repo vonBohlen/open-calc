@@ -9,5 +9,5 @@ public enum Types {
     DIVIDE,
     ROOT,
     POTENCY,
-
+    SINE
 }
